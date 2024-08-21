@@ -1,0 +1,138 @@
+openapi: "3.0.1"
+
+info:
+  title: A Virtual Learning Application API
+  version: "0.0.1"
+
+servers:
+  - url: http://localhost:8080/vle/api/v1
+
+
+paths:
+  /users:
+    get:
+      summary: Get all users added to the application
+      operationId: get_all
+      description: Returns all users registered for the application
+      responses:
+        '200':
+          description: "A list of users"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+    post:
+      summary: Insert a new user
+      operationId: insert
+      description: Create a new user and add it to the collection of users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: User successfully created
+          content:
+            application/json:
+              schema:
+                properties:
+                  userid:
+                    type: string
+                    description: the username of the user newly created
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+
+
+  /users/{username}:
+    parameters:
+      - name: username
+        in: path
+        description: username of the user
+        schema:
+          type: string
+        required: true
+    get:
+      summary: Get a single upser
+      operationId: get_user
+      description: Returns a single user based on the username
+      responses:
+        '200':
+          description: user response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+    put:
+      summary: Update an existing user
+      operationId: update_user
+      description: updates an existing user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        '200':
+          description: 'User was successfully updated'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+    delete:
+      summary: Delete an existing user
+      operationId: delete_user
+      description: deletes an existing user
+      responses:
+        '204':
+          description: User was successfully deleted
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+
+components:
+  schemas:
+    User:
+      title: User Description
+      type: object
+      properties:
+        username:
+          type: string
+          description: the username of the user
+        firstname:
+          type: string
+          description: the first name of the user
+        lastname:
+          type: string
+          description: the last name of the user
+        email:
+          type: string
+          description: the email address of the user
+    Error:
+      type: object
+      properties:
+        errorType:
+          type: string
+          enum:
+            - BadRequest
+
+            - Not Found
+
+            - InternalServerError
+        message:
+          type: string
+
+  responses:
+    ErrorResponse:
+      description: Error handling user
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
